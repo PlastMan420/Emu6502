@@ -95,14 +95,14 @@ void Ccpu6502::InitializeOpcodeMap()
     opcodeMap[0x98] = [this](UINT8) -> void { Transfer_TYA(); };
 
     // Branches
-    opcodeMap[0x90] = [this](UINT8) -> void { UINT8 off = Fetch(); Branch_BCC(); };
-    opcodeMap[0xB0] = [this](UINT8) -> void { UINT8 off = Fetch(); Branch_BCS(); };
-    opcodeMap[0xF0] = [this](UINT8) -> void { UINT8 off = Fetch(); Branch_BEQ(); };
-    opcodeMap[0x30] = [this](UINT8) -> void { UINT8 off = Fetch(); Branch_BMI(); };
-    opcodeMap[0xD0] = [this](UINT8) -> void { UINT8 off = Fetch(); Branch_BNE(); };
-    opcodeMap[0x10] = [this](UINT8) -> void { UINT8 off = Fetch(); Branch_BPL(); };
-    opcodeMap[0x50] = [this](UINT8) -> void { UINT8 off = Fetch(); Branch_BVC(); };
-    opcodeMap[0x70] = [this](UINT8) -> void { UINT8 off = Fetch(); Branch_BVS(); };
+    opcodeMap[0x90] = [this](UINT8) -> void { Branch_BCC(); };
+    opcodeMap[0xB0] = [this](UINT8) -> void { Branch_BCS(); };
+    opcodeMap[0xF0] = [this](UINT8) -> void { Branch_BEQ(); };
+    opcodeMap[0x30] = [this](UINT8) -> void { Branch_BMI(); };
+    opcodeMap[0xD0] = [this](UINT8) -> void { Branch_BNE(); };
+    opcodeMap[0x10] = [this](UINT8) -> void { Branch_BPL(); };
+    opcodeMap[0x50] = [this](UINT8) -> void { Branch_BVC(); };
+    opcodeMap[0x70] = [this](UINT8) -> void { Branch_BVS(); };
 
     // Shifts/rotates (examples)
     opcodeMap[0x0A] = [this](UINT8) -> void { ASL__Accumulator(); };
