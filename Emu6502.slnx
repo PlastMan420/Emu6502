@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="cpu6502/cpu6502.vcxproj" Id="5d8bef21-3495-457d-bc62-57776adeaee3" />
+  <Project Path="Emu6502/Emu6502.vcxproj" Id="6500be90-8d11-47f5-b982-6cbc7620540d" />
+</Solution>

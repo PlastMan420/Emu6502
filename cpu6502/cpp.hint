@@ -1,0 +1,2 @@
+#define CPU6502_API __declspec(dllexport)
+#define CPU6502_API __declspec(dllimport)
