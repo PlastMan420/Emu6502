@@ -34,8 +34,7 @@ void Ccpu6502::MachineStartup()
 {
     ZeroMemory(memory.data(), sizeof(memory));
     InitializeOpcodeMap();
-    // prime the cycle state
-    Fetch();
+    Reset();
 }
 
 void Ccpu6502::InitializeOpcodeMap()
@@ -47,7 +46,7 @@ void Ccpu6502::InitializeOpcodeMap()
     auto noop = [this](UINT8) -> void { /* Unimplemented opcode: treat as NOP */ }; 
     std::fill(opcodeMap.begin(), opcodeMap.end(), noop);
 
-    // LDA
+    // LDA: 8 access modes
     opcodeMap[0xA9] = [this](UINT8) -> void { LD_A__Immediate(); };
     opcodeMap[0xA5] = [this](UINT8) -> void { LD_A__ZP(); };
     opcodeMap[0xB5] = [this](UINT8) -> void { LD_A__ZP_X(); };
@@ -57,21 +56,21 @@ void Ccpu6502::InitializeOpcodeMap()
     opcodeMap[0xA1] = [this](UINT8) -> void { LD_A__Indexed_Indirect(); };
     opcodeMap[0xB1] = [this](UINT8) -> void { LD_A__Indirect_Indexed(); };
 
-    // LDX
+    // LDX: 5 access modes
     opcodeMap[0xA2] = [this](UINT8) -> void { LD_X__Immediate(); };
     opcodeMap[0xA6] = [this](UINT8) -> void { LD_X__ZP(); };
     opcodeMap[0xB6] = [this](UINT8) -> void { LD_X__ZP_Y(); };
     opcodeMap[0xAE] = [this](UINT8) -> void { LD_X__Absolute(); };
     opcodeMap[0xBE] = [this](UINT8) -> void { LD_X__Absolute_Y(); };
 
-    // LDY
+    // LDY: 5 access modes
     opcodeMap[0xA0] = [this](UINT8) -> void { LD_Y__Immediate(); };
     opcodeMap[0xA4] = [this](UINT8) -> void { LD_Y__ZP(); };
     opcodeMap[0xB4] = [this](UINT8) -> void { LD_Y__ZP_X(); };
     opcodeMap[0xAC] = [this](UINT8) -> void { LD_Y__Absolute(); };
     opcodeMap[0xBC] = [this](UINT8) -> void { LD_Y__Absolute_X(); };
 
-    // STA
+    // STA: 7 access modes
     opcodeMap[0x85] = [this](UINT8) -> void { ST_A__ZP(); };
     opcodeMap[0x95] = [this](UINT8) -> void { ST_A__ZP_X(); };
     opcodeMap[0x8D] = [this](UINT8) -> void { ST_A__Absolute(); };
@@ -80,7 +79,7 @@ void Ccpu6502::InitializeOpcodeMap()
     opcodeMap[0x81] = [this](UINT8) -> void { ST_A__Indexed_Indirect(); };
     opcodeMap[0x91] = [this](UINT8) -> void { ST_A__Indirect_Indexed(); };
 
-    // STX/STY
+    // STX/STY: 6 access modes
     opcodeMap[0x86] = [this](UINT8) -> void { ST_X__ZP(); };
     opcodeMap[0x96] = [this](UINT8) -> void { ST_X__ZP_Y(); };
     opcodeMap[0x8E] = [this](UINT8) -> void { ST_X__Absolute(); };
@@ -88,13 +87,13 @@ void Ccpu6502::InitializeOpcodeMap()
     opcodeMap[0x94] = [this](UINT8) -> void { ST_Y__ZP_X(); };
     opcodeMap[0x8C] = [this](UINT8) -> void { ST_Y__Absolute(); };
 
-    // Transfers
+    // Transfers: 4 access modes A<->X, A<->Y, X<->A, Y<->A
     opcodeMap[0xAA] = [this](UINT8) -> void { Transfer_TAX(); };
     opcodeMap[0x8A] = [this](UINT8) -> void { Transfer_TXA(); };
     opcodeMap[0xA8] = [this](UINT8) -> void { Transfer_TAY(); };
     opcodeMap[0x98] = [this](UINT8) -> void { Transfer_TYA(); };
 
-    // Branches
+    // Branches: 8 access modes
     opcodeMap[0x90] = [this](UINT8) -> void { Branch_BCC(); };
     opcodeMap[0xB0] = [this](UINT8) -> void { Branch_BCS(); };
     opcodeMap[0xF0] = [this](UINT8) -> void { Branch_BEQ(); };
@@ -104,29 +103,33 @@ void Ccpu6502::InitializeOpcodeMap()
     opcodeMap[0x50] = [this](UINT8) -> void { Branch_BVC(); };
     opcodeMap[0x70] = [this](UINT8) -> void { Branch_BVS(); };
 
-    // Shifts/rotates (examples)
+    // Shifts/rotates
+    
+    // ASL: 4 access modes
     opcodeMap[0x0A] = [this](UINT8) -> void { ASL__Accumulator(); };
     opcodeMap[0x06] = [this](UINT8) -> void { ASL__ZP(); };
     opcodeMap[0x16] = [this](UINT8) -> void { ASL__ZP_X(); };
     opcodeMap[0x0E] = [this](UINT8) -> void { ASL__Absolute(); };
 
+    // LSR: 4 access modes
     opcodeMap[0x4A] = [this](UINT8) -> void { LSR__Accumulator(); };
     opcodeMap[0x46] = [this](UINT8) -> void { LSR__ZP(); };
     opcodeMap[0x4E] = [this](UINT8) -> void { LSR__Absolute(); };
 
+    // ROL: 2 access modes
     opcodeMap[0x2A] = [this](UINT8) -> void { ROL__Accumulator(); };
     opcodeMap[0x6A] = [this](UINT8) -> void { ROR__Accumulator(); };
 
-    // Logic
+    // BIT OPS: 3 ops
     opcodeMap[0x29] = [this](UINT8) -> void { BIT_AND__Immediate(); };
     opcodeMap[0x09] = [this](UINT8) -> void { BIT_OR__Immediate(); };
     opcodeMap[0x49] = [this](UINT8) -> void { BIT_XOR__Immediate(); };
 
-    // BIT
+    // BIT OPS: 2 ops
     opcodeMap[0x24] = [this](UINT8) -> void { BIT__ZP(); };
     opcodeMap[0x2C] = [this](UINT8) -> void { BIT__Absolute(); };
 
-    // Jump/JSR/RTS/BRK/RTI
+    // Jump/JSR/RTS/BRK/RTI: 6 access modes
     opcodeMap[0x4C] = [this](UINT8) -> void { JMP__Absolute(); };
     opcodeMap[0x6C] = [this](UINT8) -> void { JMP__Indirect(); };
     opcodeMap[0x20] = [this](UINT8) -> void { JSR__Absolute(); };
@@ -145,11 +148,6 @@ void Ccpu6502::ExecuteInstruction()
     if (handler) handler(opcode);
 }
 
-/// <summary>
-/// One cpu cycle
-/// </summary>
-/// <param name="dummyRead"></param>
-/// <returns></returns>
 UINT8 Ccpu6502::Fetch()
 {
     return Read(PC++);

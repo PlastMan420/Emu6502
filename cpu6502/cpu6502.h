@@ -125,11 +125,23 @@ public:
     void MachineStartup();
 
     /// <summary>
-    /// Clock cycle
+    /// One CPU cycle that increments program counter.
     /// </summary>
-    /// <param name="dummyRead"></param>
+    /// <returns></returns>
     UINT8 Fetch();
+
+    /// <summary>
+    /// One CPU cycle, returns data at the specified address. Does not increment program counter.
+    /// </summary>
+    /// <param name="address"></param>
+    /// <returns></returns>
     UINT8 Read(UINT16 address);
+
+    /// <summary>
+    /// One CPU cycle, writes data to the specified address. Does not increment program counter.
+    /// </summary>
+    /// <param name="address"></param>
+    /// <param name="value"></param>
     void Write(UINT16 address, UINT8 value);
 
     void run_op(const std::function<void(UINT8)>& callback, uint8_t data) {
