@@ -1,0 +1,8 @@
+{
+  "dependencies": [
+    {
+      "name": "mimalloc",
+      "features": ["override"]
+    }
+  ]
+}
