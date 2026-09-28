@@ -1,8 +1,11 @@
 // Emu6502.cpp : Defines the entry point for the application.
-//
+
+// Keep mimalloc at top of main file
+#include <mimalloc-new-delete.h>
 
 #include "framework.h"
 #include "Emu6502.h"
+#include "cpu6502.h"
 
 #define MAX_LOADSTRING 100
 

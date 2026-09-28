@@ -30,12 +30,27 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="emunesbus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cartridge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filesystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Emu6502.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="framework.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filesystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cartridge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
