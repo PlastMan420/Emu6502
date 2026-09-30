@@ -1,36 +1,65 @@
 #include "cartridge.h"
-
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #include <windows.h>
 #include <string>
 #include "filesystem.h"
 #include <sal.h>
-#include <mimalloc.h>
 #include <span>
 
 Ccartridge::~Ccartridge()
 {
-    mi_free(PRGROM.data());
+
+}
+
+inline UINT16 Ccartridge::PRGROMSize() const
+{
+    switch (eNesFSVerison) {
+        case(ENESFSVERSION::_10): {
+            return PRGROMBANKS * BANKSIZEBYTES;
+        }
+        case(ENESFSVERSION::_20): {
+            UINT8 prgMsb = CartridgeHeader[9] & 0b00001111;
+            bool exponentMode = (prgMsb & 0x00001000) == 0x0000F000;
+
+            if (exponentMode) {
+                UINT8 prg_lsb = PRGROMBANKS;
+                UINT8 exponent = prg_lsb >> 2;
+                UINT8 multiplier = prg_lsb & 0x03;
+                DWORD total_bytes = (1 << exponent) * (multiplier * 2 + 1);
+
+                return total_bytes / 16384;
+            }
+
+            return ((prgMsb) << 8) | PRGROMBANKS;
+        }
+    }
+}
+
+/// <summary>
+/// Cartridge address => mapper => CPU Read
+/// </summary>
+inline UINT16 Ccartridge::CartridgeCPURead(UINT16 addr)
+{
+    return mapper->CpuMapRead(addr);
+}
+
+inline UINT16 Ccartridge::CartridgeCPUWrite(UINT16 addr)
+{
+    return mapper->CpuMapWrite(addr);
+}
+
+inline UINT16 Ccartridge::CartridgePPURead(UINT16 addr)
+{
+    return mapper->PpuMapRead(addr);
+}
+
+inline UINT16 Ccartridge::CartridgePPUWrite(UINT16 addr)
+{
+    return mapper->PpuMapWrite(addr);
 }
 
 void Ccartridge::OpenCartridge(_In_ const std::wstring& sFileName)
 {
-    HANDLE hRom = OpenFile(sFileName);
-
-    if (hRom == INVALID_HANDLE_VALUE) {
-        printf("Failed to open file. Error: %lu\n", GetLastError());
-        
-    }
-
-    LARGE_INTEGER fileSize;
-    if (!GetFileSizeEx(hRom, &fileSize)) {
-        CloseHandle(hRom);
-    }
-
-    size_t totalBytes = static_cast<size_t>(fileSize.QuadPart);
-
-    PUINT8 cartridgeData = (PUINT8)mi_malloc(static_cast<size_t>(totalBytes));
-    CartridgeData = std::span<UINT8>(cartridgeData, totalBytes);
+    auto cartridgeData = OpenCartridgeFile(sFileName);
     
     CartridgeHeader = CartridgeData.subspan(0, HEADERBLOCKSIZE);
 

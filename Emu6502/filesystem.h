@@ -1,7 +1,5 @@
 #pragma once
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
-// Windows Header Files
 #include <windows.h>
-#include <string>
+#include <vector>
 
-HANDLE OpenFile(_In_ const std::wstring& loc);
+std::vector<UINT8> OpenCartridgeFile(_In_ const std::wstring& loc);
