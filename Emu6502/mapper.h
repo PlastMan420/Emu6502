@@ -22,14 +22,18 @@ public:
 
     CMapper() : CPUAddressSpace(std::make_shared<std::vector<UINT8>>(Ccpu6502::MAX_MEMORY_SIZE, 0)) {}
 
-    constexpr static UINT16 CPUBUS_PRGROM_START = 0x8000;
-    constexpr static UINT16 CPUBUS_PRGROM_END = 0xBFFF;
+    constexpr static UINT16 CPUBUS_SYSMEM_START = 0;
+    constexpr static UINT16 CPUBUS_SYSMEM_END = 0x1FFF;
+    constexpr static UINT16 CPUBUS_SYSMEM_MIRROR_BITMASK = 0x07FF;
 
     constexpr static UINT16 CPUBUS_PPU_REGISTERS_START = 0x2000;
     constexpr static UINT16 CPUBUS_PPU_REGISTERS_END = 0x3FFF;
 
-    constexpr static UINT16 CPUBUS_SRAM_START = 0x6000;
-    constexpr static UINT16 CPUBUS_SRAM_END = 0x7FFF;
+    constexpr static UINT16 CPUBUS_PRGRAM_START = 0x6000;
+    constexpr static UINT16 CPUBUS_PRGRAM_END = 0x7FFF;
+
+    constexpr static UINT16 CPUBUS_PRGROM_START = 0x8000;
+    constexpr static UINT16 CPUBUS_PRGROM_END = 0xBFFF;
 
     constexpr static UINT16 PPUBUS_CHRROM_START = 0x0000;
     constexpr static UINT16 PPUBUS_CHRROM_END = 0x1FFF;
