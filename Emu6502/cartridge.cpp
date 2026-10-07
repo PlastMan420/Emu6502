@@ -1,9 +1,13 @@
+#include "framework.h"
 #include "cartridge.h"
 #include <windows.h>
 #include <string>
 #include "filesystem.h"
 #include <sal.h>
 #include <span>
+
+Ccartridge::Ccartridge()
+{}
 
 Ccartridge::~Ccartridge()
 {
@@ -34,29 +38,6 @@ inline UINT16 Ccartridge::PRGROMSize() const
     }
 }
 
-/// <summary>
-/// Cartridge address => mapper => CPU Read
-/// </summary>
-inline UINT16 Ccartridge::CartridgeCPURead(UINT16 addr)
-{
-    return mapper->CpuMapRead(addr);
-}
-
-inline UINT16 Ccartridge::CartridgeCPUWrite(UINT16 addr)
-{
-    return mapper->CpuMapWrite(addr);
-}
-
-inline UINT16 Ccartridge::CartridgePPURead(UINT16 addr)
-{
-    return mapper->PpuMapRead(addr);
-}
-
-inline UINT16 Ccartridge::CartridgePPUWrite(UINT16 addr)
-{
-    return mapper->PpuMapWrite(addr);
-}
-
 void Ccartridge::OpenCartridge(_In_ const std::wstring& sFileName)
 {
     auto cartridgeData = OpenCartridgeFile(sFileName);
@@ -75,7 +56,7 @@ void Ccartridge::OpenCartridge(_In_ const std::wstring& sFileName)
     PRGROM = CartridgeData.subspan(pgromOffset, PRGROMSize());
 }
 
-ENESFSVERSION Ccartridge::ComputeNesFSVersion(std::span<UINT8> cartridgeHeader)
+ENESFSVERSION Ccartridge::ComputeNesFSVersion(std::span<const UINT8> cartridgeHeader)
 {
     DWORD cartridgeFileType = 
         (static_cast<DWORD>(cartridgeHeader[3]) << 24) |

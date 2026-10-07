@@ -20,7 +20,11 @@
 // Windows Header Files
 #include <windows.h>
 #include <array>
+#include <vector>
 #include <functional>
+#include <memory>
+
+#include "../cpubase/cpubase.h"
 
 typedef UINT8 CPUDATA;
 typedef UINT16 CPUADDR;
@@ -57,11 +61,27 @@ struct SCiscMicroOp {
     eAddressMode addressMode;
 };
 
+struct SCPU6502State {
+    UINT8 A = 0;  // Accumulator
+    UINT8 X = 0;  // Index Register X
+    UINT8 Y = 0;  // Index Register Y
+    UINT8 SP = 0; // Stack Pointer
+    UINT16 PC = 0; // Program Counter
+    UINT8 P = 0;   // Processor Status
+};
+
+struct SCPU6502Init {
+    DWORD MemorySize = 0;
+
+    //If you need to restore from a state.
+    SCPU6502State InitialState = {};
+};
+
 // This class is exported from the dll
-class CPU6502_API Ccpu6502 {
+class CPU6502_API Ccpu6502 : public Ccpubase {
 public:
     // 64KB of memory
-    constexpr static size_t MEMORY_SIZE = 65536;
+    constexpr static DWORD MAX_MEMORY_SIZE = 65536;
 
     // flags
     constexpr static UINT8 CARRYFLAG = 0B00000001;
@@ -83,6 +103,9 @@ public:
     constexpr static UINT8 MEM_ACCESS_INDIRECT_INDEXED = 0x11;
 
     std::function<void(UINT8)> CurrentInstruction = [this](UINT8) -> void { /* NOP */ }; 
+
+    DWORD MEMORY_SIZE = MAX_MEMORY_SIZE;
+    UINT16 CLKFRQHZ = 1789773; // Hz
 
     // Registers
 
@@ -114,15 +137,17 @@ public:
     /// <summary>
     /// Machine memory. PC is 16 bits wide. but the address bus is only 8bits.
     /// </summary>
-    std::array<UINT8, 65536> memory; // 64KB of memory
+    std::shared_ptr<std::vector<UINT8>> SystemMemory;
     // Methods to manipulate the CPU state
 
     Ccpu6502();
+    Ccpu6502(const SCPU6502Init& init, std::shared_ptr<std::vector<UINT8>> memory);
+
     void Reset();
     void ExecuteInstruction();
     void InitializeOpcodeMap();
-    void LoadProgram(const PUINT8 program, size_t size);
     void MachineStartup();
+    void CLK();
 
     /// <summary>
     /// One CPU cycle that increments program counter.

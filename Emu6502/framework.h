@@ -9,8 +9,9 @@
 // Windows Header Files
 #include <windows.h>
 #include <sal.h>
+#include <mimalloc.h>
+
 #include <memory.h>
 #include <tchar.h>
 #include <string>
 #include <array>
-#include <mimalloc.h>

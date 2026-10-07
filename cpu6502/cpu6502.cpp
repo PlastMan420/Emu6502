@@ -2,8 +2,10 @@
 //
 
 #include "pch.h"
-#include "framework.h"
+#include <windows.h>
 #include "cpu6502.h"
+#include <vector>
+#include <memory>
 
 // This is an example of an exported variable
 CPU6502_API int nCcpu6502=0;
@@ -17,7 +19,18 @@ CPU6502_API int fnCcpu6502(void)
 // This is the constructor of a class that has been exported.
 Ccpu6502::Ccpu6502()
 {
-    return;
+}
+
+Ccpu6502::Ccpu6502(const SCPU6502Init& init, std::shared_ptr<std::vector<UINT8>> memory) : SystemMemory(memory)
+{
+    MEMORY_SIZE = init.MemorySize;
+
+    A = init.InitialState.A;
+    X = init.InitialState.X;
+    Y = init.InitialState.Y;
+    SP = init.InitialState.SP;
+    PC = init.InitialState.PC;
+    P = init.InitialState.P;
 }
 
 void Ccpu6502::Reset()
@@ -32,10 +45,13 @@ void Ccpu6502::Reset()
 
 void Ccpu6502::MachineStartup()
 {
-    ZeroMemory(memory.data(), sizeof(memory));
+    //ZeroMemory(SystemMemory->data(), sizeof(SystemMemory));
     InitializeOpcodeMap();
     Reset();
 }
+
+void Ccpu6502::CLK()
+{}
 
 void Ccpu6502::InitializeOpcodeMap()
 {
@@ -143,13 +159,14 @@ void Ccpu6502::InitializeOpcodeMap()
 
 void Ccpu6502::ExecuteInstruction()
 {
-    UINT8 opcode = memory.at(PC++);
+    UINT8 opcode = SystemMemory->at(PC++);
     auto &handler = opcodeMap[opcode];
     if (handler) handler(opcode);
 }
 
 UINT8 Ccpu6502::Fetch()
 {
+    CLK();
     return Read(PC++);
 }
 
@@ -157,14 +174,18 @@ UINT8 Ccpu6502::Read(UINT16 address)
 {
     // tick-aware memory read
     // future: increment cycle counters or bus state here
-    return memory.at(address);
+    CLK();
+
+    return SystemMemory->at(address);
 }
 
 void Ccpu6502::Write(UINT16 address, UINT8 value)
 {
     // tick-aware memory write
     // future: increment cycle counters or bus state here
-    memory.at(address) = value;
+    CLK();
+
+    SystemMemory->at(address) = value;
 }
 
 inline void Ccpu6502::Flags__CLC()
@@ -973,16 +994,16 @@ inline void Ccpu6502::BRK()
     UINT16 returnAddr = PC + 1;
     UINT8 high = (UINT8)(returnAddr >> 8);
     UINT8 low = (UINT8)(returnAddr & 0xFF);
-    memory.at(0x0100 | SP) = high; SP--; 
-    memory.at(0x0100 | SP) = low; SP--;
+    SystemMemory->at(0x0100 | SP) = high; SP--; 
+    SystemMemory->at(0x0100 | SP) = low; SP--;
     // push P with B flag set
     UINT8 pushedP = P | BREAKFLAG;
-    memory.at(0x0100 | SP) = pushedP; SP--;
+    SystemMemory->at(0x0100 | SP) = pushedP; SP--;
     // set interrupt disable
     P |= INTERRUPTFLAG;
     // load vector at 0xFFFE/0xFFFF
-    UINT8 vectLow = memory.at(0xFFFE);
-    UINT8 vectHigh = memory.at(0xFFFF);
+    UINT8 vectLow = SystemMemory->at(0xFFFE);
+    UINT8 vectHigh = SystemMemory->at(0xFFFF);
     PC = ((UINT16)vectHigh << 8) | vectLow;
 }
 
@@ -990,11 +1011,11 @@ inline void Ccpu6502::RTI()
 {
     // Pull P, then pull PC
     SP++;
-    P = memory.at(0x0100 | SP);
+    P = SystemMemory->at(0x0100 | SP);
     SP++;
-    UINT8 low = memory.at(0x0100 | SP);
+    UINT8 low = SystemMemory->at(0x0100 | SP);
     SP++;
-    UINT8 high = memory.at(0x0100 | SP);
+    UINT8 high = SystemMemory->at(0x0100 | SP);
     PC = ((UINT16)high << 8) | low;
 }
 

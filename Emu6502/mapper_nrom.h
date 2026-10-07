@@ -8,12 +8,12 @@ public:
     CMapperNROM()
     {
         sMapperConfig = {
-            0, 0, 0x8000, 0xFFFF, 0, 0x1FFF
+            0, 0
         };
     }
 
-    DWORD CpuMapRead(UINT16 addr) override;
-    DWORD CpuMapWrite(UINT16 addr) override;
-    DWORD PpuMapRead(UINT16 addr) override;
-    DWORD PpuMapWrite(UINT16 addr) override;
+    UINT8 CpuMapRead(UINT16 addr) override;
+    bool CpuMapWrite(UINT16 addr, UINT8 value) override;
+    UINT8 PpuMapRead(UINT16 addr) override;
+    bool PpuMapWrite(UINT16 addr, UINT8 value) override;
 };

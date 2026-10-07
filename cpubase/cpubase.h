@@ -28,7 +28,6 @@ public:
     virtual void CLK() = 0;
     virtual void ExecuteInstruction() = 0;
     virtual void InitializeOpcodeMap() = 0;
-    virtual void LoadProgram(const PUINT8 program, size_t size) = 0;
     virtual void MachineStartup() = 0;
 };
 

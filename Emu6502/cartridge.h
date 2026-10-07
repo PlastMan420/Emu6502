@@ -35,16 +35,12 @@ public:
 
     ENESFSVERSION eNesFSVerison = ENESFSVERSION::INVALID;
 
-    std::vector<UINT8> PCartridgeData;
-
-    std::span<UINT8> CartridgeData;
-    std::span<UINT8> CartridgeHeader;
-    std::span<UINT8> TRAINER;
-    std::span<UINT8> PRGROM;
+    std::span<const UINT8> CartridgeData;
+    std::span<const UINT8> CartridgeHeader;
+    std::span<const UINT8> TRAINER;
+    std::span<const UINT8> PRGROM;
 
     UINT8 PRGROMBANKS = CartridgeHeader[4];
-
-    std::unique_ptr<CMapper> mapper;
 
     /// <summary>
     /// Header byte 4 (LSB) and bits 0-3 of Header byte 9 (MSB) together specify its size. If the MSB nibble is $0-E, LSB and MSB together simply specify the PRG-ROM size in 16 KiB units:
@@ -74,11 +70,20 @@ public:
     inline UINT8 nPRGBANKS() const {return CHRROMSize() / 8; }
 
     inline UINT16 CartridgeCPURead(UINT16 addr);
-    inline UINT16 CartridgeCPUWrite(UINT16 addr);
+    inline UINT16 CartridgeCPUWrite(UINT16 addr, UINT8 value);
 
     inline UINT16 CartridgePPURead(UINT16 addr);
-    inline UINT16 CartridgePPUWrite(UINT16 addr);
+    inline UINT16 CartridgePPUWrite(UINT16 addr, UINT8 value);
+
+    inline void BuildSystemMemory() {
+        std::vector<UINT8> MainF
+    }
 private:
+    /// <summary>
+    /// Full cartridge binary.
+    /// </summary>
+    std::vector<UINT8> PCartridgeData;
+
     /// <summary>
     /// Open cartidge file at specified location.
     /// </summary>
@@ -90,5 +95,5 @@ private:
     /// </summary>
     /// <param name="cartridgeHeader"></param>
     /// <returns></returns>
-    ENESFSVERSION ComputeNesFSVersion(std::span<UINT8> cartridgeHeader);
+    ENESFSVERSION ComputeNesFSVersion(std::span<const UINT8> cartridgeHeader);
 };
