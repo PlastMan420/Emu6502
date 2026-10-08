@@ -38,6 +38,12 @@ public:
     constexpr static UINT16 PPUBUS_CHRROM_START = 0x0000;
     constexpr static UINT16 PPUBUS_CHRROM_END = 0x1FFF;
 
+    constexpr static UINT16 PPUBUS_NAMETABLE_START = 0x2000;
+    constexpr static UINT16 PPUBUS_NAMETABLE_END = 0x23FF;
+
+    constexpr static UINT16 PPUBUS_PALETTE_START = 0x3F00;
+    constexpr static UINT16 PPUBUS_PALETTE_END = 0x3FFF;
+
     /// <summary>
     /// should not be acessed directly. Use a mapper function.
     /// </summary>
