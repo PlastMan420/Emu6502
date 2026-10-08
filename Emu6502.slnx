@@ -5,5 +5,7 @@
   </Configurations>
   <Project Path="cpu6502-test/cpu6502-test.vcxproj" Id="fac311cf-102a-48c1-9346-48f060356975" />
   <Project Path="cpu6502/cpu6502.vcxproj" Id="5d8bef21-3495-457d-bc62-57776adeaee3" />
+  <Project Path="cpubase/cpubase.vcxproj" Id="b8145555-75b2-4e22-bdfe-451f97959e0a" />
   <Project Path="Emu6502/Emu6502.vcxproj" Id="6500be90-8d11-47f5-b982-6cbc7620540d" />
+  <Project Path="ppuolc2c02/ppuolc2c02.vcxproj" Id="4c04d7ff-87aa-48cb-88b6-4be9f056439e" />
 </Solution>

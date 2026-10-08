@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\mappers">
+      <UniqueIdentifier>{77d8f980-7aab-47f9-b38d-530509dedefe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -30,13 +33,22 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="emunesbus.h">
+    <ClInclude Include="cpubus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cartridge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="filesystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mapper.h">
+      <Filter>Header Files\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="mapper_nrom.h">
+      <Filter>Header Files\mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="machine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -51,6 +63,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cartridge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mapper_nrom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpubus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mappers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

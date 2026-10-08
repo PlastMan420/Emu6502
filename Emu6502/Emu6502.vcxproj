@@ -157,9 +157,12 @@
   <ItemGroup>
     <ClInclude Include="cartridge.h" />
     <ClInclude Include="Emu6502.h" />
-    <ClInclude Include="emunesbus.h" />
+    <ClInclude Include="cpubus.h" />
     <ClInclude Include="filesystem.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="machine.h" />
+    <ClInclude Include="mapper.h" />
+    <ClInclude Include="mapper_nrom.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -167,8 +170,11 @@
   <ItemGroup>
     <ClCompile Include="cartridge.cpp" />
     <ClCompile Include="Emu6502.cpp" />
+    <ClCompile Include="cpubus.cpp" />
     <ClCompile Include="filesystem.cpp" />
     <ClCompile Include="framework.cpp" />
+    <ClCompile Include="mappers.cpp" />
+    <ClCompile Include="mapper_nrom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Emu6502.rc" />
