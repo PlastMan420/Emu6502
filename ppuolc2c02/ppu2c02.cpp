@@ -6,7 +6,7 @@
 #include "ppu2c02.h"
 #include "palette.h"
 #include <Windows.h>
-
+#include "../cpubase/cpubase.h"
 
 // This is the constructor of a class that has been exported.
 Cppu2c02::Cppu2c02()
@@ -17,7 +17,7 @@ Cppu2c02::Cppu2c02()
 void Cppu2c02::Reset()
 {}
 
-void Cppu2c02::CLK()
+UINT8 Cppu2c02::CLK(eInstruction instructionType, UINT16 address, UINT8 value)
 {
     ++CurrentCycle;
     if (CurrentCycle == 341)

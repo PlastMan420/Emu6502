@@ -72,6 +72,8 @@ typedef std::array<std::array<D2D1::ColorF, 128>, 128> PpuPatternTable;
 /// </summary>
 class PPU2C02_API Cppu2c02 : public Ccpubase {
 public:
+    constexpr static DWORD PPU_FREQ_NTSC_HZ = 596667;
+
     Cppu2c02(void);
     
     /// <summary>
@@ -100,7 +102,7 @@ public:
 
     // Inherited via Ccpubase
     void Reset() override;
-    void CLK() override;
+    UINT8 CLK(eInstruction instructionType, UINT16 address, UINT8 value) override;
     void ExecuteInstruction() override;
     void InitializeOpcodeMap() override;
     void MachineStartup() override;

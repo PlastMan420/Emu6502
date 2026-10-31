@@ -3,12 +3,33 @@
 #include <windows.h>
 #include "cartridge.h"
 #include <vector>
-#include <span>
+#include <chrono>
+#include <ratio>
 #include <memory>
 #include <cpu6502.h>
 #include <string>
 #include <unordered_map>
 #include "mapper.h"
+#include "../ppuolc2c02/ppu2c02.h"
+
+using cpuhz1790000 = std::chrono::duration<DWORD64, std::ratio<1, 1790000>>;
+using ppuhz596667 = std::chrono::duration<DWORD64, std::ratio<1, 596667>>;
+
+struct NtscCpuClock {
+    using duration = cpuhz1790000;
+    using rep = duration::rep;
+    using period = duration::period;
+    using time_point = std::chrono::time_point<NtscCpuClock>;
+
+    static constexpr bool is_steady = true;
+
+    static time_point now() noexcept {
+        // Cast the system's high-precision steady clock down to our custom units
+        return time_point(std::chrono::duration_cast<duration>(
+            std::chrono::steady_clock::now().time_since_epoch()
+        ));
+    }
+};
 
 class CEmuNesCPUBus
 {
@@ -38,9 +59,13 @@ public:
     const std::shared_ptr<std::vector<UINT8>> CpuMemory;
 
     const Ccartridge Cartridge;
-    const Ccpu6502 Cpu;
+    Ccpu6502 Cpu;
+    Cppu2c02 Ppu;
+
     const std::unique_ptr<CMapper> Mapper;
 
     UINT8 SystemRead(UINT16 addr);
     void SystemWrite(UINT16 addr, UINT8 value);
+    void StartCPUCLK();
+    void StartPPUCLK();
 };

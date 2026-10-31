@@ -8,15 +8,6 @@
 #include <memory>
 #include "../cpubase/cpubase.h"
 
-// This is an example of an exported variable
-CPU6502_API int nCcpu6502=0;
-
-// This is an example of an exported function.
-CPU6502_API int fnCcpu6502(void)
-{
-    return 0;
-}
-
 // This is the constructor of a class that has been exported.
 Ccpu6502::Ccpu6502()
 {

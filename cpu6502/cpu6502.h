@@ -23,8 +23,8 @@
 #include <vector>
 #include <functional>
 #include <memory>
-
 #include "../cpubase/cpubase.h"
+#include <cstdint>
 
 typedef UINT8 CPUDATA;
 typedef UINT16 CPUADDR;
@@ -89,6 +89,9 @@ public:
     constexpr static UINT8 MEM_ACCESS_ABSOLUTE_Y = 0x19;
     constexpr static UINT8 MEM_ACCESS_INDEXED_INDIRECT = 0x01;
     constexpr static UINT8 MEM_ACCESS_INDIRECT_INDEXED = 0x11;
+
+    constexpr static DWORD CPU_FREQ_NTSC_HZ = 1790000;
+    constexpr static DWORD CPU_FREQ_PAL_HZ = 1660000;
 
     std::function<void(UINT8)> CurrentInstruction = [this](UINT8) -> void { /* NOP */ }; 
 

@@ -1,2 +1,2 @@
-#define PPUOLC2C02_API __declspec(dllexport)
-#define PPUOLC2C02_API __declspec(dllimport)
+#define PPU2C02_API __declspec(dllexport)
+#define PPU2C02_API __declspec(dllimport)
