@@ -6,6 +6,7 @@
 #include "cpu6502.h"
 #include <vector>
 #include <memory>
+#include "../cpubase/cpubase.h"
 
 // This is an example of an exported variable
 CPU6502_API int nCcpu6502=0;
@@ -50,8 +51,21 @@ void Ccpu6502::MachineStartup()
     Reset();
 }
 
-void Ccpu6502::CLK()
-{}
+UINT8 Ccpu6502::CLK(eInstruction instructionType, UINT16 address, UINT8 value)
+{
+    switch (instructionType) {
+        case eInstruction::FETCHOP: {
+            return Fetch();
+        }
+        case eInstruction::READMEMORY: {
+            return Read(address);
+        }
+        case eInstruction::WRITEMEMORY: {
+            Write(address, value);
+            return 0;
+        }
+    }
+}
 
 void Ccpu6502::InitializeOpcodeMap()
 {
@@ -164,27 +178,23 @@ void Ccpu6502::ExecuteInstruction()
     if (handler) handler(opcode);
 }
 
+/// <summary>
+/// On a real computer it's usually CLK > FETCH or CLK > instruction 
+//  I'm doing the opposite. since some instructions span over multiple cycles.
+/// </summary>
+/// <returns></returns>
 UINT8 Ccpu6502::Fetch()
 {
-    CLK();
     return Read(PC++);
 }
 
 UINT8 Ccpu6502::Read(UINT16 address)
 {
-    // tick-aware memory read
-    // future: increment cycle counters or bus state here
-    CLK();
-
     return SystemMemory->at(address);
 }
 
 void Ccpu6502::Write(UINT16 address, UINT8 value)
 {
-    // tick-aware memory write
-    // future: increment cycle counters or bus state here
-    CLK();
-
     SystemMemory->at(address) = value;
 }
 
@@ -761,13 +771,13 @@ inline void Ccpu6502::ASL__Absolute_X()
 
 inline void Ccpu6502::ASL(UINT16 addr)
 {
-    UINT8 v = Read(addr);                         // C5
+    UINT8 v = CLK(eInstruction::READMEMORY, addr, 0); // C5
 
     UINT8 newCarry = (v & 0x80) ? CARRYFLAG : 0;
     UINT8 r = static_cast<UINT8>(v << 1);
 
-    Write(addr, v);                              // C6
-    Write(addr, r);                              // C7
+    CLK(eInstruction::WRITEMEMORY, addr, v); // C6
+    CLK(eInstruction::WRITEMEMORY, addr, r); // C7
 
     P = (P & ~CARRYFLAG) | newCarry;
     P = (P & ~(ZEROFLAG | NEGATIVEFLAG)) |
@@ -807,15 +817,16 @@ inline void Ccpu6502::LSR__Absolute_X()
 
 inline void Ccpu6502::LSR(UINT16 addr)
 {
-    Read(addr);                    // C4 dummy read
+    //Read(addr);                    // C4 dummy read
+    CLK(eInstruction::READMEMORY, addr, 0);// C4 dummy read
 
-    UINT8 v = Read(addr);          // C5
+    UINT8 v = CLK(eInstruction::READMEMORY, addr, 0); // C5
 
     UINT8 newCarry = (v & 0x01) ? CARRYFLAG : 0;
     UINT8 r = static_cast<UINT8>(v >> 1);
 
-    Write(addr, v);                // C6
-    Write(addr, r);                // C7
+    CLK(eInstruction::READMEMORY, addr, v); // c6
+    CLK(eInstruction::READMEMORY, addr, r); // c7
 
     P = (P & ~CARRYFLAG) | newCarry;
     P = (P & ~(ZEROFLAG | NEGATIVEFLAG)) |
@@ -855,17 +866,17 @@ inline void Ccpu6502::ROL__Absolute_X()
 
 inline void Ccpu6502::ROL(UINT16 addr)
 {
-    Read(addr);                    // C4 dummy read
+    CLK(eInstruction::READMEMORY, addr, 0); // C4 dummy read
 
-    UINT8 v = Read(addr);          // C5
+    UINT8 v = CLK(eInstruction::READMEMORY, addr, 0); // C5
 
     UINT8 carryIn = (P & CARRYFLAG) ? 1 : 0;
     UINT8 newCarry = (v & 0x80) ? CARRYFLAG : 0;
 
     UINT8 r = static_cast<UINT8>((v << 1) | carryIn);
 
-    Write(addr, v);                // C6
-    Write(addr, r);                // C7
+    CLK(eInstruction::WRITEMEMORY, addr, v); // C6
+    CLK(eInstruction::WRITEMEMORY, addr, r); // C7
 
     P = (P & ~CARRYFLAG) | newCarry;
     P = (P & ~(ZEROFLAG | NEGATIVEFLAG)) |

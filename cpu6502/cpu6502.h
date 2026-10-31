@@ -29,13 +29,6 @@
 typedef UINT8 CPUDATA;
 typedef UINT16 CPUADDR;
 
-enum class eCounterOperation {
-    READOP = 0,
-    READMEMORY,
-    CISCMICROOP,
-    NOP
-};
-
 enum class eAddressMode {
     IMMEDIATE = 0,
     RELATIVE_ADDR,
@@ -49,11 +42,6 @@ enum class eAddressMode {
     ABSOLUTE_Y,
     INDEXED_INDIRECT,
     INDIRECT_INDEXED
-};
-
-enum class eMachineState {
-    HALTED = 0,
-    RUNNING = 1,
 };
 
 struct SCiscMicroOp {
@@ -147,27 +135,27 @@ public:
     void ExecuteInstruction();
     void InitializeOpcodeMap();
     void MachineStartup();
-    void CLK();
+    UINT8 CLK(eInstruction instructionType, UINT16 address, UINT8 value);
 
     /// <summary>
     /// One CPU cycle that increments program counter.
     /// </summary>
     /// <returns></returns>
-    UINT8 Fetch();
+    UINT8 Fetch() override;
 
     /// <summary>
     /// One CPU cycle, returns data at the specified address. Does not increment program counter.
     /// </summary>
     /// <param name="address"></param>
     /// <returns></returns>
-    UINT8 Read(UINT16 address);
+    UINT8 Read(UINT16 address) override;
 
     /// <summary>
     /// One CPU cycle, writes data to the specified address. Does not increment program counter.
     /// </summary>
     /// <param name="address"></param>
     /// <param name="value"></param>
-    void Write(UINT16 address, UINT8 value);
+    void Write(UINT16 address, UINT8 value) override;
 
     void run_op(const std::function<void(UINT8)>& callback, uint8_t data) {
         callback(data);
